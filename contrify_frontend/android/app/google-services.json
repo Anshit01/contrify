@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "280796403928",
+    "project_id": "contrify-81157",
+    "storage_bucket": "contrify-81157.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:280796403928:android:eaad3442a770f783c1dfad",
+        "android_client_info": {
+          "package_name": "com.bobhacker.contrify"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "280796403928-s46snnn18bk6uj1cp5q5q7lgupru6pnb.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.bobhacker.contrify",
+            "certificate_hash": "045ed0253b2317d342d753a2987aac6c3922ef29"
+          }
+        },
+        {
+          "client_id": "280796403928-0l5ervdegklashi2nm50hjcjfiojha3i.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDScSOYVV_yx9oM5yZmx_oYaC0R80EvjSY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "280796403928-0l5ervdegklashi2nm50hjcjfiojha3i.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
