@@ -1,0 +1,3 @@
+DEBUG=true
+FIREBASE_KEY=api_key
+DATABASE_URL=database_url
