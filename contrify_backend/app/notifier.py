@@ -2,7 +2,7 @@ from pyfcm import FCMNotification
 from os import environ
 
 api_key = environ.get('FIREBASE_KEY')
-print(api_key)
+
 push_service = FCMNotification(api_key=api_key)
 
 def notifyAll(messageTitle, messageBody):

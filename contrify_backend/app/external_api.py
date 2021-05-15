@@ -10,8 +10,8 @@ params = {
 def parseContract(contract: dict):
     parsedContract = {
         'address': contract['address'],
-        'codeHash': contract['codeHash'],
-        'balance': contract['balance'],
+        'codeHash': str(contract['codeHash']),
+        'balance': str(contract['balance']),
         'creatorName': contract['creator'].get('alias', ''),
         'creatorAddress': contract['creator'].get('address', ''),
         'firstActivity': contract['firstActivityTime'][:-1].replace('T', '  '),

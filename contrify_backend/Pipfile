@@ -6,6 +6,11 @@ name = "pypi"
 [packages]
 flask = "*"
 gunicorn = "*"
+python-dotenv = "*"
+flask-sqlalchemy = "*"
+requests = "*"
+pyfcm = "*"
+psycopg2-binary = "*"
 
 [dev-packages]
 

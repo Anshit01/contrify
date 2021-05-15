@@ -10,11 +10,12 @@ from .worker import checkForContracts
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = environ['DATABASE_URL']
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
 
 class Contract(db.Model):
     address = db.Column(db.String(200), primary_key=True)
-    balance = db.Column(db.Integer)
+    balance = db.Column(db.String(200))
     creatorName = db.Column(db.String(256))
     creatorAddress = db.Column(db.String(200))
     firstActivity = db.Column(db.String(50))
@@ -25,21 +26,9 @@ class Contract(db.Model):
     def __repr__(self):
         return f'<Contract {self.address}>'
 
-class Contracts(db.Model):
-    address = db.Column(db.String(200), primary_key=True)
-    
-    def __repr__(self):
-        return f"<Contracts {self.address}>"
 
 @app.route("/")
 def index():
-    try:
-        test_address = Contracts(address = 'asfadgadsasfas')
-        db.session.add(test_address)
-        db.session.commit()
-    except:
-        pass
-
     return {
         'message': 'API for Contrify app',
         'documentationUrl': 'https://documenter.getpostman.com/view/10774800/TzRVf6CM'
@@ -47,7 +36,7 @@ def index():
 
 @app.route("/v1/data")
 def printData():
-    address = Contracts.query.all()
+    address = Contract.query.all()
     for i in range(len(address)):
         address[i] = str(address[i])
     return jsonify(address)
@@ -81,6 +70,18 @@ def contract(address):
         }, 404
     return contract
 
+@app.route('/v1/contracts/unique')
+def uniqueContracts():
+    limit = request.args.get('limit', '100')
+    if not limit.isdigit() or int(limit) > 10000:
+        return {
+            'error': 'Invalid limit'
+        }
+    limit = int(limit)
+    contracts = getContracts(limit)
+    return jsonify(contracts)
+
+
 @app.route('/v1/stats')
 def stats():
     statDict = getStats()
@@ -95,24 +96,25 @@ def notify():
 def newContractNotify():
     contracts = getContracts(2)
     print(contracts)
-    for i in range(len(contracts)):
-        q = db.session.query(Contracts.address).filter(Contracts.address==contracts[i]['address'])
-        if db.session.query(q.exists()).scalar():
-            pass
-        else:
+    for contract in contracts:
+        q = db.session.query(Contract.codeHash).filter(Contract.codeHash==contract['codeHash'])
+        if not db.session.query(q.exists()).scalar():
             newContractNotification()
-            test_address = Contracts(address = contracts[i]['address'])
-            db.session.add(test_address)
-            db.session.commit()
-            
+            insertIntoDatabase(contract)
     return jsonify(contracts)
 
-@app.route('/v1/newContract')
+@app.route('/v1/newContract', methods=['GET','POST'])
 def newContract():
     if request.method == 'POST':
         contracts = request.json
         print(contracts)
+        for k, contract in contracts.items():
+            q = db.session.query(Contract.address).filter(Contract.address==contract['address'])
+            if not db.session.query(q.exists()).scalar():
+                insertIntoDatabase(contract, commit=False)
+        db.session.commit()    
         return {}
+
     address = request.args['address']
     balance = request.args['balance']
     creatorName = request.args['creatorName']
@@ -137,3 +139,20 @@ def newContract():
         db.session.add(contract)
         db.session.commit()
     return dict(request.args)
+
+
+def insertIntoDatabase(contract: dict, commit=True):
+    newContract = Contract(
+        address=contract['address'],
+        balance=contract['balance'],
+        creatorName=contract['creatorName'],
+        creatorAddress=contract['creatorAddress'],
+        firstActivity=contract['firstActivity'],
+        lastActivity=contract['lastActivity'],
+        url=contract['url'],
+        codeHash=contract['codeHash']
+    )
+    db.session.add(newContract)
+    print(contract)
+    if commit:
+        db.session.commit()
