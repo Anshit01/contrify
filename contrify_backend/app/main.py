@@ -78,8 +78,19 @@ def uniqueContracts():
             'error': 'Invalid limit'
         }
     limit = int(limit)
-    contracts = getContracts(limit)
-    return jsonify(contracts)
+    contracts = Contract.query.limit(limit).all()
+    contractsd = [{
+        'address': contract.address,
+        'codeHash': contract.codeHash,
+        'balance': contract.balance,
+        'creatorName': contract.creatorName,
+        'creatorAddress': contract.creatorAddress,
+        'firstActivity': contract.firstActivity,
+        'lastActivity': contract.lastActivity,
+        'url': contract.url,
+        
+    } for contract in contracts]
+    return jsonify(contractsd)
 
 
 @app.route('/v1/stats')
