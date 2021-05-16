@@ -74,12 +74,18 @@ def notify():
 
 @app.route('/v1/newContractNotify')
 def newContractNotify():
-    contracts = getContracts(2)
+    limit = request.args.get('limit', '100')
+    if not limit.isdigit() or int(limit) > 10000:
+        return {
+            'error': 'Invalid limit'
+        }
+    limit = int(limit)
+    contracts = getContracts(limit)
     print(contracts)
     for contract in contracts:
         if Contract.find_one({'codeHash': contract['codeHash']}) is None:
             newContractNotification()
-            insertIntoDatabase(contract)
+            insertIntoDatabase(dict(contract))
     return jsonify(contracts)
 
 @app.route('/v1/newContract', methods=['POST'])
@@ -88,10 +94,10 @@ def newContract():
     print(contracts)
     for k, contract in contracts.items():
         if Contract.find_one({'codeHash': contract['codeHash']}) is None:
-            insertIntoDatabase(contract)  
+            insertIntoDatabase(dict(contract))  
     return {}
 
 
-def insertIntoDatabase(contract: dict, commit=True):
+def insertIntoDatabase(contract: dict):
     Contract.insert_one(contract)
     print(contract)
