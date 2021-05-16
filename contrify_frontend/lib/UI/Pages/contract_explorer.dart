@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:url_launcher/url_launcher.dart';
+import 'package:contrify/Constants/colors.dart' as AppColors;
 
 class ContractExplore extends StatelessWidget {
   const ContractExplore({Key? key, required this.c}) : super(key: key);
@@ -10,20 +12,40 @@ class ContractExplore extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        leading: IconButton(
+          icon: Icon(
+            Icons.arrow_back_ios,
+            color: Colors.white,
+          ),
+          onPressed: () => Navigator.pop(context),
+        ),
+        centerTitle: false,
+        title: Text(
+          'EXPLORER',
+          style: TextStyle(color: Colors.white),
+        ),
+        // backgroundColor: Colors.transparent,
+        // shadowColor: Colors.transparent,
+        // elevation: 0,
+        backgroundColor: AppColors.PRIMARY_COLOR,
+      ),
       body: SafeArea(
         child: SingleChildScrollView(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Padding(
-                padding: const EdgeInsets.all(10.0),
-                child: IconButton(
-                  icon: Icon(Icons.arrow_back_ios),
-                  onPressed: () => Navigator.pop(context),
-                ),
+              SizedBox(
+                height: 20,
               ),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 20),
+              Container(
+                margin: EdgeInsets.all(10),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(5),
+                  color: Color.fromRGBO(236, 235, 235, 1),
+                ),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
                 child: Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -42,7 +64,7 @@ class ContractExplore extends StatelessWidget {
                           '${c.address}',
                           overflow: TextOverflow.ellipsis,
                           style: GoogleFonts.notoSans(
-                              fontSize: 15,
+                              fontSize: 13,
                               color: Color.fromRGBO(51, 51, 51, 1)),
                         ),
                         GestureDetector(
@@ -64,15 +86,21 @@ class ContractExplore extends StatelessWidget {
                 ),
               ),
               Padding(
-                padding: const EdgeInsets.fromLTRB(20, 30, 0, 15),
+                padding: const EdgeInsets.fromLTRB(20, 10, 0, 0),
                 child: Text(
                   'Creator',
                   style: GoogleFonts.nunito(
                       fontSize: 18, fontWeight: FontWeight.w600),
                 ),
               ),
-              Padding(
-                padding: const EdgeInsets.only(left: 20),
+              Container(
+                margin: EdgeInsets.all(10),
+                decoration: BoxDecoration(
+                  border: Border.all(color: Color.fromRGBO(222, 220, 220, 1)),
+                  borderRadius: BorderRadius.circular(5),
+                  color: Color.fromRGBO(255, 253, 253, 1),
+                ),
+                padding: const EdgeInsets.only(left: 20, top: 10, bottom: 10),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -99,21 +127,28 @@ class ContractExplore extends StatelessWidget {
                     Text(
                       '${c.address}',
                       style: GoogleFonts.notoSans(
+                        color: Color.fromRGBO(92, 89, 89, 1),
                           fontSize: 13, fontWeight: FontWeight.w300),
                     )
                   ],
                 ),
               ),
               Padding(
-                padding: const EdgeInsets.fromLTRB(20, 30, 0, 15),
+                padding: const EdgeInsets.fromLTRB(20, 10, 0, 0),
                 child: Text(
                   'Balance',
                   style: GoogleFonts.nunito(
                       fontSize: 18, fontWeight: FontWeight.w600),
                 ),
               ),
-              Padding(
-                padding: const EdgeInsets.only(left: 20),
+              Container(
+                margin: EdgeInsets.all(10),
+                decoration: BoxDecoration(
+                  border: Border.all(color: Color.fromRGBO(222, 220, 220, 1)),
+                  borderRadius: BorderRadius.circular(5),
+                  color: Color.fromRGBO(255, 253, 253, 1),
+                ),
+                padding: const EdgeInsets.only(left: 20, top: 10, bottom: 10),
                 child: Row(
                   children: [
                     Text(
@@ -133,84 +168,77 @@ class ContractExplore extends StatelessWidget {
                 ),
               ),
               Padding(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 30, vertical: 40),
+                padding: const EdgeInsets.fromLTRB(20, 10, 0, 0),
+                child: Text(
+                  'First Activity',
+                  style: GoogleFonts.nunito(
+                      fontSize: 18, fontWeight: FontWeight.w600),
+                ),
+              ),
+              Container(
+                margin: EdgeInsets.all(10),
+                decoration: BoxDecoration(
+                  border: Border.all(color: Color.fromRGBO(222, 220, 220, 1)),
+                  borderRadius: BorderRadius.circular(5),
+                  color: Color.fromRGBO(255, 253, 253, 1),
+                ),
+                padding: const EdgeInsets.only(left: 20, top: 10, bottom: 10),
                 child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Padding(
-                      padding: const EdgeInsets.all(10.0),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            'First Activity',
-                            style: GoogleFonts.nunito(
-                                fontSize: 18, fontWeight: FontWeight.bold),
-                          ),
-                          SizedBox(
-                            height: 10,
-                          ),
-                          Row(
-                            children: [
-                              Image.asset(
-                                'assets/icons/calender.png',
-                                height: 24,
-                                width: 24,
-                              ),
-                              SizedBox(
-                                width: 10,
-                              ),
-                              Text(
-                                '${c.getFirstActivity}',
-                                overflow: TextOverflow.ellipsis,
-                                style: GoogleFonts.poppins(fontSize: 12),
-                              )
-                            ],
-                          )
-                        ],
-                      ),
+                    Image.asset(
+                      'assets/icons/calender.png',
+                      height: 24,
+                      width: 24,
                     ),
-                    Padding(
-                      padding: const EdgeInsets.all(10.0),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            'Last Activity',
-                            style: GoogleFonts.nunito(
-                                fontWeight: FontWeight.bold, fontSize: 18),
-                          ),
-                          SizedBox(
-                            height: 10,
-                          ),
-                          Row(
-                            children: [
-                              SvgPicture.asset(
-                                'assets/icons/clock.svg',
-                                height: 18,
-                                width: 18,
-                              ),
-                              SizedBox(
-                                width: 10,
-                              ),
-                              Text(
-                                '${c.getLastActivity}',
-                                overflow: TextOverflow.ellipsis,
-                                style: GoogleFonts.poppins(fontSize: 12),
-                              ),
-                            ],
-                          )
-                        ],
-                      ),
+                    SizedBox(
+                      width: 10,
+                    ),
+                    Text(
+                      '${c.getFirstActivity}',
+                      overflow: TextOverflow.ellipsis,
+                      style: GoogleFonts.poppins(fontSize: 12),
                     )
+                  ],
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.fromLTRB(20, 10, 0, 0),
+                child: Text(
+                  'Last Activity',
+                  style: GoogleFonts.nunito(
+                      fontSize: 18, fontWeight: FontWeight.w600),
+                ),
+              ),
+              Container(
+                margin: EdgeInsets.all(10),
+                decoration: BoxDecoration(
+                  border: Border.all(color: Color.fromRGBO(222, 220, 220, 1)),
+                  borderRadius: BorderRadius.circular(5),
+                  color: Color.fromRGBO(255, 253, 253, 1),
+                ),
+                padding: const EdgeInsets.only(left: 20, top: 10, bottom: 10),
+                child: Row(
+                  children: [
+                    SvgPicture.asset(
+                      'assets/icons/clock.svg',
+                      height: 18,
+                      width: 18,
+                    ),
+                    SizedBox(
+                      width: 10,
+                    ),
+                    Text(
+                      '${c.getLastActivity}',
+                      overflow: TextOverflow.ellipsis,
+                      style: GoogleFonts.poppins(fontSize: 12),
+                    ),
                   ],
                 ),
               ),
               Padding(
                 padding: const EdgeInsets.only(left: 20),
                 child: TextButton(
-                    onPressed: () => 1,
+                    onPressed: () => launch(c.url),
                     child: Text(
                       'View on Better Call Dev',
                       style: GoogleFonts.poppins(
