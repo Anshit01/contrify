@@ -58,7 +58,7 @@ def uniqueContracts():
             'error': 'Invalid limit'
         }
     limit = int(limit)
-    contracts = list(Contract.find({}, {'_id': 0}).limit(limit))
+    contracts = list(Contract.find({}, {'_id': 0}).sort('firstActivity', -1).limit(limit))
     return jsonify(contracts)
 
 
