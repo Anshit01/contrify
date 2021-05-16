@@ -35,8 +35,7 @@ def getContract(address: str):
     contract = response.json()
     if 'errors' in contract:
         return None
-    # contract = parseContract(contract)
-    # contract['contract'] = 
+    contract = parseContract(contract)
     return contract
 
 def getStats():
