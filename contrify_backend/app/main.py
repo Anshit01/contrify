@@ -1,31 +1,13 @@
 from flask import Flask, jsonify, request
-from flask_sqlalchemy import SQLAlchemy
-from sqlalchemy.sql import exists
 import requests
 from os import environ
 
+from .db import Contract
 from .external_api import getContracts, getContract, getStats
 from .notifier import newContractNotification
 from .worker import checkForContracts
 
 app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = environ['DATABASE_URL']
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-db = SQLAlchemy(app)
-
-class Contract(db.Model):
-    address = db.Column(db.String(200), primary_key=True)
-    balance = db.Column(db.String(200))
-    creatorName = db.Column(db.String(256))
-    creatorAddress = db.Column(db.String(200))
-    firstActivity = db.Column(db.String(50))
-    lastActivity = db.Column(db.String(50))
-    url = db.Column(db.String(200))
-    codeHash = db.Column(db.String(200))
-
-    def __repr__(self):
-        return f'<Contract {self.address}>'
-
 
 @app.route("/")
 def index():
@@ -36,10 +18,8 @@ def index():
 
 @app.route("/v1/data")
 def printData():
-    address = Contract.query.all()
-    for i in range(len(address)):
-        address[i] = str(address[i])
-    return jsonify(address)
+    contracts = Contract.find({}, {'_id': 0})
+    return jsonify(cntracts)
 
 @app.route("/<version>")
 def versionCheck(version):
@@ -78,19 +58,8 @@ def uniqueContracts():
             'error': 'Invalid limit'
         }
     limit = int(limit)
-    contracts = Contract.query.limit(limit).all()
-    contractsd = [{
-        'address': contract.address,
-        'codeHash': contract.codeHash,
-        'balance': contract.balance,
-        'creatorName': contract.creatorName,
-        'creatorAddress': contract.creatorAddress,
-        'firstActivity': contract.firstActivity,
-        'lastActivity': contract.lastActivity,
-        'url': contract.url,
-        
-    } for contract in contracts]
-    return jsonify(contractsd)
+    contracts = list(Contract.find({}, {'_id': 0}).limit(limit))
+    return jsonify(contracts)
 
 
 @app.route('/v1/stats')
@@ -108,62 +77,21 @@ def newContractNotify():
     contracts = getContracts(2)
     print(contracts)
     for contract in contracts:
-        q = db.session.query(Contract.codeHash).filter(Contract.codeHash==contract['codeHash'])
-        if not db.session.query(q.exists()).scalar():
+        if Contract.find_one({'codeHash': contract['codeHash']}) is None:
             newContractNotification()
             insertIntoDatabase(contract)
     return jsonify(contracts)
 
-@app.route('/v1/newContract', methods=['GET','POST'])
+@app.route('/v1/newContract', methods=['POST'])
 def newContract():
-    if request.method == 'POST':
-        contracts = request.json
-        print(contracts)
-        for k, contract in contracts.items():
-            q = db.session.query(Contract.address).filter(Contract.address==contract['address'])
-            if not db.session.query(q.exists()).scalar():
-                insertIntoDatabase(contract, commit=False)
-        db.session.commit()    
-        return {}
-
-    address = request.args['address']
-    balance = request.args['balance']
-    creatorName = request.args['creatorName']
-    creatorAddress = request.args['creatorAddress']
-    firstActivity = request.args['firstActivity']
-    lastActivity = request.args['lastActivity']
-    url = request.args['url']
-    codeHash = request.args['codeHash']
-
-    q = db.session.query(Contract.address).filter(Contract.address==address)
-    if not db.session.query(q.exists()).scalar():
-        contract = Contract(
-            address=address,
-            balance=balance,
-            creatorName=creatorName,
-            creatorAddress=creatorAddress,
-            firstActivity=firstActivity,
-            lastActivity=lastActivity,
-            url=url,
-            codeHash=codeHash
-        )
-        db.session.add(contract)
-        db.session.commit()
-    return dict(request.args)
+    contracts = request.json
+    print(contracts)
+    for k, contract in contracts.items():
+        if Contract.find_one({'codeHash': contract['codeHash']}) is None:
+            insertIntoDatabase(contract)  
+    return {}
 
 
 def insertIntoDatabase(contract: dict, commit=True):
-    newContract = Contract(
-        address=contract['address'],
-        balance=contract['balance'],
-        creatorName=contract['creatorName'],
-        creatorAddress=contract['creatorAddress'],
-        firstActivity=contract['firstActivity'],
-        lastActivity=contract['lastActivity'],
-        url=contract['url'],
-        codeHash=contract['codeHash']
-    )
-    db.session.add(newContract)
+    Contract.insert_one(contract)
     print(contract)
-    if commit:
-        db.session.commit()
