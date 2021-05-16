@@ -61,7 +61,7 @@ def contracts():
     contracts = getContracts(limit)
     return jsonify(contracts)
 
-@app.route('/v1/contracts/<address>')
+@app.route('/v1/contracts/search/<address>')
 def contract(address):
     contract = getContract(address)
     if not contract:
