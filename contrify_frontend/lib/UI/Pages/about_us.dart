@@ -14,7 +14,6 @@ class AboutUs extends StatelessWidget {
         appBar: AppBar(
           leading: IconButton(
             icon: Icon(Icons.arrow_back_ios,
-                // color: Colors.black,
                 color: Colors.white),
             onPressed: () => Navigator.pop(context),
           ),
@@ -23,13 +22,6 @@ class AboutUs extends StatelessWidget {
             'ABOUT',
             style: TextStyle(color: Colors.white),
           ),
-          // style: GoogleFonts.nunito(
-          // color: Color.fromRGBO(89, 85, 85, 1),
-          // color: Colors.w,
-          // fontWeight: FontWeight.w600)),
-          // backgroundColor: Colors.transparent,
-          // shadowColor: Colors.transparent,
-          // elevation: 0,
           backgroundColor: AppColors.PRIMARY_COLOR,
         ),
         body: ListView(

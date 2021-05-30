@@ -16,7 +16,18 @@ class LatestContractsPage extends StatefulWidget {
 class _LatestContractsPageState extends State<LatestContractsPage> {
   bool _isSearching = false;
   final state = AppState.instance;
-  bool _isloading = false;
+
+  void _addressSearch() async {
+    Contract? c = await AppState.instance.searchAddress(_controller.text);
+    if (c != null) {
+      Navigator.push(context,
+          MaterialPageRoute(builder: (context) => ContractExplore(c: c)));
+    }
+    _controller.text = '';
+    setState(() {
+      _isSearching = false;
+    });
+  }
 
   TextEditingController _controller = TextEditingController();
   @override
@@ -40,24 +51,7 @@ class _LatestContractsPageState extends State<LatestContractsPage> {
                 controller: _controller,
                 autofocus: true,
                 style: TextStyle(color: Colors.white),
-                onFieldSubmitted: (text) async {
-                  setState(() {
-                    _isloading = true;
-                  });
-                  Contract? c =
-                      await AppState.instance.searchAddress(_controller.text);
-                  if (c != null) {
-                    Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => ContractExplore(c: c)));
-                  }
-                  _controller.text = '';
-                  setState(() {
-                    _isloading = false;
-                    _isSearching = false;
-                  });
-                },
+                onFieldSubmitted: (text) => _addressSearch(),
                 decoration: InputDecoration(
                     hintText: 'Search smart contract by address...',
                     hintStyle: GoogleFonts.poppins(color: Colors.white),
@@ -68,24 +62,7 @@ class _LatestContractsPageState extends State<LatestContractsPage> {
                         height: 24,
                         width: 24,
                       ),
-                      onPressed: () async {
-                        setState(() {
-                          _isloading = true;
-                        });
-                        Contract? c = await AppState.instance
-                            .searchAddress(_controller.text);
-                        if (c != null) {
-                          Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) => ContractExplore(c: c)));
-                        }
-                        _controller.text = '';
-                        setState(() {
-                          _isloading = false;
-                          _isSearching = false;
-                        });
-                      },
+                      onPressed: _addressSearch,
                     )))
             : Text('CONTRIFY'),
         actions: [
@@ -100,31 +77,19 @@ class _LatestContractsPageState extends State<LatestContractsPage> {
         ],
       ),
       body: SafeArea(
-        child: Stack(
-          children: [
-            StreamBuilder<List<Contract>>(
-                stream: state.dataStream,
-                builder: (context, snapshot) {
-                  if (snapshot.hasData) {
-                    return ListView(
-                      children: snapshot.data!
-                          .map((e) => ContractItem(c: e))
-                          .toList(),
-                    );
-                  }
-                  return Center(
-                    child: Text('No Contract found'),
-                  );
-                }),
-            if (_isloading)
-              Center(
-                  child: Container(
-                width: 100,
-                height: 100,
-                child: CircularProgressIndicator(),
-              )),
-          ],
-        ),
+        child: StreamBuilder<List<Contract>>(
+            stream: state.dataStream,
+            builder: (context, snapshot) {
+              if (snapshot.hasData) {
+                return ListView(
+                  children:
+                      snapshot.data!.map((e) => ContractItem(c: e)).toList(),
+                );
+              }
+              return Center(
+                child: Text('No Contract found'),
+              );
+            }),
       ),
     );
   }

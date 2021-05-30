@@ -25,9 +25,6 @@ class ContractExplore extends StatelessWidget {
           'EXPLORER',
           style: TextStyle(color: Colors.white),
         ),
-        // backgroundColor: Colors.transparent,
-        // shadowColor: Colors.transparent,
-        // elevation: 0,
         backgroundColor: AppColors.PRIMARY_COLOR,
       ),
       body: SafeArea(

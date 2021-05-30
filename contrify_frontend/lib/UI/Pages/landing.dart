@@ -3,7 +3,6 @@ import 'package:contrify/StateManagement/app_state.dart';
 import 'package:contrify/UI/Pages/about_us.dart';
 import 'package:contrify/UI/Pages/contract_explorer.dart';
 import 'package:contrify/UI/Pages/latest_contracts.dart';
-import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:contrify/Constants/colors.dart' as AppColors;
 import 'package:flutter_svg/svg.dart';
@@ -20,32 +19,9 @@ class _LandingPageState extends State<LandingPage> {
   @override
   void initState() {
     super.initState();
-    checkFirebaseMessage();
+    AppState.instance.handleFirebaseMessage();
   }
 
-  void checkFirebaseMessage() async {
-    RemoteMessage? initialMessage =
-        await FirebaseMessaging.instance.getInitialMessage();
-
-    if (initialMessage != null) {
-      setState(() {
-        _isSearching = true;
-      });
-      Contract? c =
-          await AppState.instance.searchAddress(initialMessage.data['address']);
-
-      if (c != null) {
-        Navigator.push(context,
-            MaterialPageRoute(builder: (context) => ContractExplore(c: c)));
-      }
-      _controller.text = '';
-      setState(() {
-        _isSearching = false;
-      });
-    }
-  }
-
-  bool _isSearching = false;
   TextEditingController _controller = TextEditingController();
   @override
   Widget build(BuildContext context) {
@@ -71,7 +47,9 @@ class _LandingPageState extends State<LandingPage> {
                             color: AppColors.PRIMARY_COLOR,
                             fontSize: 48,
                             fontWeight: FontWeight.w400)),
-                            SizedBox(height: 10,),
+                    SizedBox(
+                      height: 10,
+                    ),
                     Padding(
                         padding: const EdgeInsets.symmetric(
                             horizontal: 32, vertical: 10),
@@ -82,9 +60,6 @@ class _LandingPageState extends State<LandingPage> {
                             fontSize: 14,
                           ),
                           onSubmitted: (text) async {
-                            setState(() {
-                              _isSearching = true;
-                            });
                             Contract? c = await AppState.instance
                                 .searchAddress(_controller.text);
 
@@ -96,9 +71,6 @@ class _LandingPageState extends State<LandingPage> {
                                           ContractExplore(c: c)));
                             }
                             _controller.text = '';
-                            setState(() {
-                              _isSearching = false;
-                            });
                           },
                           decoration: InputDecoration(
                             hintText: 'Search smart contract by address',
@@ -200,13 +172,6 @@ class _LandingPageState extends State<LandingPage> {
                     ),
                   ],
                 ),
-                if (_isSearching)
-                  Center(
-                      child: Container(
-                    width: 100,
-                    height: 100,
-                    child: CircularProgressIndicator(),
-                  )),
               ]);
             }),
       ),
